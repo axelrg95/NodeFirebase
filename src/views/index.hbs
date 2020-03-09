@@ -1,0 +1,52 @@
+<div class="col-md-6 offset-md-3">
+    <div class="card">
+        <div class="card-header">
+            <h1>Contactos</h1>
+        </div>
+        {{#if contact}}
+        
+        {{else}}
+            <div class="card-body">
+                {{#if contacts}}
+                <ul class="list-group">
+                    {{#each contacts}}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{data.firstname}}
+                        {{data.lastname}} / 
+                        {{data.email}}
+                        <div>
+                            <a href="/{{id}}" class="btn btn-primary">Modify</a>
+                            <a href="/delete-contact/{{id}}" class="btn btn-danger">Delete</a>
+                        </div>
+                    </li>
+                    {{/each}}
+                </ul>
+                {{else}}
+                    <p>No Contacts Yet.</p>
+                {{/if}}
+            </div>
+        {{/if}}
+        <div class="card-footer">
+            <form method="POST">
+                <input type="hidden" name="key" value="{{contact.id}}">
+                <div class="form-group">
+                    <input type="text" name="firstname" value="{{contact.data.firstname}}" placeholder="Firstname" class="form-control" autofocus>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="lastname" value="{{contact.data.lastname}}" placeholder="Lastname" class="form-control">
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" value="{{contact.data.email}}" placeholder="email" class="form-control">
+                </div>
+                <div class="form-group">
+                    <input type="tel" name="phone" value="{{contact.data.phone}}" placeholder="Phone" class="form-control">
+                </div>
+                {{#if contact}}
+                    <input class="btn btn-primary btn-block" formaction="/modify-contact" name="submit" type="submit" value="Modificar" />
+                {{else}}
+                    <input class="btn btn-primary btn-block" formaction="/new-contact" name="submit" type="submit" value="Agregar" />
+                {{/if}}
+            </form>
+        </div>
+    </div>
+</div>
