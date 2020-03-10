@@ -1,24 +1,10 @@
-const admin = require('firebase-admin')
-
-var serviceAccount = require("../../node-firebase-ejemplo-3c46d-firebase-adminsdk-ykipa-1ff3d61237.json");
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: 'https://node-firebase-ejemplo-3c46d.firebaseio.com/',
-
-});
-
-const db = admin.database();
-const dbf = admin.firestore();
-
-const { Router}= require('express');
+const funHttp = require('../functions/fnhttp');
+const { Router } = require('express');
 const router = Router();
 
 router.get('/', (req, res) => {
-     let lista = [];
-
-     dbf.collection('contactos').get()
-    .then((snapshot) => {
+    let lista = [];
+    funHttp.getColeccion('contactos').then((snapshot) => {
         snapshot.forEach((doc) => {
             var contacto = {id:doc.id,data:doc.data()};
             lista.push(contacto);
@@ -27,25 +13,20 @@ router.get('/', (req, res) => {
     })
     .catch((err) => {
         console.log('Error getting documents', err);
-    });
+    });;
+    
 });
 
 router.get('/:id', (req, res) => {
-    /*db.ref('contacts/' + req.params.id).on('value', (snapshot) => {
-        data = snapshot.val();
-        res.render('index', {contact: data , key: snapshot.key});
-     });*/
-
-     let id = req.params.id;
-
-     dbf.collection('contactos').doc(id).get()
-    .then((snapshot) => {
+    let id = req.params.id;
+    funHttp.getColeccionById('contactos',id).then((snapshot) => {
         var contacto = {id:snapshot.id,data:snapshot.data()};
         res.render('index', {contact: contacto});
     })
     .catch((err) => {
         console.log('Error getting documents', err);
     });
+
 });
 
 router.post('/new-contact', (req, res) => {
@@ -55,7 +36,8 @@ router.post('/new-contact', (req, res) => {
         email: req.body.email,
         phone: req.body.phone
     }
-    dbf.collection('contactos').add(newContact);
+
+    funHttp.pushDocumento('contactos',newContact);
     res.redirect('/');
 });
 
@@ -69,13 +51,13 @@ router.post('/modify-contact', (req, res) => {
         phone: req.body.phone
     }
 
-    dbf.collection('contactos').doc(id).update(modifyContact);
+    funHttp.updateDocumento('contactos', id ,modifyContact);
     res.redirect('/');
 });
 
 router.get('/delete-contact/:id', (req, res) => {
     let id = req.params.id;
-    dbf.collection('contactos').doc(id).delete();
+    funHttp.deleteDocumento('contactos', id);
     res.redirect('/');
 });
 
